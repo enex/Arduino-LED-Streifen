@@ -1,0 +1,84 @@
+<!document html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>
+			Arduino LED-stripe
+		</title>
+		<style>
+			img{
+				max-width: 100%;
+				height: auto;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>Arduino LED-Streifen</h1>
+		<h2>Zeile</h2>
+		<ul>
+			<li>Steuerung des LED-Stripes per PC
+				<ul>
+					<li>Notification bei neuer E-mail</li>
+					<li>Bei Viedeo atomatische Anpassung der Farbe</li>
+				</ul>
+			</li>
+			<li>Angehen des Streifens bei dunkelheit und Aktivierung des Bewegunsmelder</li>
+		</ul>
+		<h2>Aufbau der Schaltung</h2>
+		<img src="Schaltung_Steckplatine.png" width="640px">
+		<h2>Erster Entwurf der Bibliothek:</h2>
+		<pre><code>
+<span style="color: #CC6600;">class</span> Stripe{
+&nbsp;<span style="color: #CC6600;">public</span>:
+&nbsp;&nbsp;&nbsp;Stripe(<span style="color: #CC6600;">int</span> r, <span style="color: #CC6600;">int</span> g, <span style="color: #CC6600;">int</span> b);
+&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">void</span> RGB(<span style="color: #CC6600;">int</span> r, <span style="color: #CC6600;">int</span> g, <span style="color: #CC6600;">int</span> b);
+&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">void</span> Black();
+&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">void</span> Fade(<span style="color: #CC6600;">int</span> led, <span style="color: #CC6600;">int</span> time);
+&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">void</span> Rand();
+&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">int</span> _r;
+&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">int</span> _b;
+&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">int</span> _g;
+};
+<span style="color: #7E7E7E;"><b>Stripe:</b></span>:Stripe(<span style="color: #CC6600;">int</span> r, <span style="color: #CC6600;">int</span> g, <span style="color: #CC6600;">int</span> b){
+&nbsp;&nbsp;_r&nbsp;=&nbsp;r;
+&nbsp;&nbsp;_b&nbsp;=&nbsp;b;
+&nbsp;&nbsp;_g&nbsp;=&nbsp;g;
+}
+<span style="color: #CC6600;">void</span> Stripe::RGB(<span style="color: #CC6600;">int</span> r, <span style="color: #CC6600;">int</span> g, <span style="color: #CC6600;">int</span> b){
+&nbsp;&nbsp;<span style="color: #CC6600;">analogWrite</span>(_r,r);
+&nbsp;&nbsp;<span style="color: #CC6600;">analogWrite</span>(_g,g);
+&nbsp;&nbsp;<span style="color: #CC6600;">analogWrite</span>(_b,b);
+}
+<span style="color: #CC6600;">void</span> Stripe::Black(){
+&nbsp;&nbsp;RGB(0,0,0);
+}
+<span style="color: #CC6600;">void</span> Stripe::Fade(<span style="color: #CC6600;">int</span> led,<span style="color: #CC6600;">int</span> time){
+&nbsp;&nbsp;Black();
+&nbsp;&nbsp;<span style="color: #CC6600;">int</span> d = time / 102;
+&nbsp;&nbsp;<span style="color: #CC6600;">for</span>(<span style="color: #CC6600;">int</span> fadeValue = 0 ; fadeValue &lt;= 255; fadeValue +=5) { 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">analogWrite</span>(led, fadeValue);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">delay</span>(d);
+&nbsp;&nbsp;}
+&nbsp;&nbsp;<span style="color: #CC6600;">for</span>(<span style="color: #CC6600;">int</span> fadeValue = 255 ; fadeValue &gt;= 0; fadeValue -=5) { 
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">analogWrite</span>(led, fadeValue);
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #CC6600;">delay</span>(d);
+&nbsp;&nbsp;}
+}
+<span style="color: #CC6600;">void</span> Stripe::Rand(){
+&nbsp;&nbsp;RGB(<span style="color: #CC6600;">random</span>(255),<span style="color: #CC6600;">random</span>(255),<span style="color: #CC6600;">random</span>(255));
+}
+Stripe&nbsp;s(10,&nbsp;11,&nbsp;9);
+<span style="color: #CC6600;">int</span> BM = 7;
+<span style="color: #CC6600;">void</span> <span style="color: #CC6600;"><b>setup</b></span>() {
+&nbsp;&nbsp;<span style="color: #CC6600;">randomSeed</span>(<span style="color: #CC6600;">analogRead</span>(0));
+&nbsp;&nbsp;<span style="color: #CC6600;">pinMode</span>(BM, <span style="color: #006699;">INPUT</span>);
+}
+again&nbsp;forever:</span>
+<span style="color: #CC6600;">void</span> <span style="color: #CC6600;"><b>loop</b></span>() {
+&nbsp;&nbsp;s.Rand();
+&nbsp;&nbsp;<span style="color: #CC6600;">delay</span>(200);
+&nbsp;&nbsp;s.Fade(s._g,3000);
+}
+		</code></pre>
+	</body>
+</html>
